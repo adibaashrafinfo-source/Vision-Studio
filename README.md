@@ -20,7 +20,7 @@ The design is rebuilt 1:1 from the HTML references in `design-reference/` (shipp
 ## Build progress
 
 - [x] **Step 1** — Laravel scaffold, MySQL `.env` config, all migrations + Eloquent models
-- [ ] Step 2 — Admin auth (session-based, Super Admin)
+- [x] **Step 2** — Admin auth (session-based `admin` guard, Super Admin, branded login)
 - [ ] Step 3 — Admin panel pages (Dashboard, Orders, Products, Categories, Customers,
       Website, Marketing, Reports, Blog, Reviews, Coupons, Settings)
 - [ ] Step 4 — Storefront pages (Home, Category, Product, Cart, Checkout, Account)
@@ -50,6 +50,12 @@ php artisan serve
 
 > The committed `.env.example` targets **MySQL** (production). For a zero-setup local run,
 > set `DB_CONNECTION=sqlite` and `touch database/database.sqlite`.
+
+### Admin login
+
+After `php artisan migrate --seed`, sign in at **`/admin/login`** with the seeded
+Super Admin (defaults: `admin@visionstudio.test` / `password` — override via the
+`ADMIN_*` vars in `.env`). Create more admins with `php artisan vision:make-admin`.
 
 ## Deployment checklist (cPanel)
 
