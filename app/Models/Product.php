@@ -11,10 +11,12 @@ class Product extends Model
         'slug',
         'sku',
         'category_id',
+        'brand',
         'price',
         'compare_price',
         'stock_qty',
         'status',
+        'featured',
         'short_desc',
         'long_desc',
     ];
@@ -25,7 +27,13 @@ class Product extends Model
             'price' => 'decimal:2',
             'compare_price' => 'decimal:2',
             'stock_qty' => 'integer',
+            'featured' => 'boolean',
         ];
+    }
+
+    public function scopeFeatured($query)
+    {
+        return $query->where('featured', true);
     }
 
     public function category()

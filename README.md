@@ -21,8 +21,10 @@ The design is rebuilt 1:1 from the HTML references in `design-reference/` (shipp
 
 - [x] **Step 1** — Laravel scaffold, MySQL `.env` config, all migrations + Eloquent models
 - [x] **Step 2** — Admin auth (session-based `admin` guard, Super Admin, branded login)
-- [ ] Step 3 — Admin panel pages (Dashboard, Orders, Products, Categories, Customers,
-      Website, Marketing, Reports, Blog, Reviews, Coupons, Settings)
+- [x] **Step 3** — Admin panel pages, built 1:1 from the reference design with a shared
+      navy shell (sidebar + topbar) and real controllers/CRUD: Dashboard, Orders,
+      Products, Categories, Customers, Website, Marketing, Reports, Blog, Reviews,
+      Coupons, Appearance, Settings
 - [ ] Step 4 — Storefront pages (Home, Category, Product, Cart, Checkout, Account)
 - [ ] Step 5 — `site_settings` → live storefront control (hero, logo, footer, socials, theme)
 - [ ] Step 6 — Image upload wiring
