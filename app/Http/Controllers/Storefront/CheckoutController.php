@@ -28,6 +28,7 @@ class CheckoutController extends Controller
             'discount' => Cart::discount(),
             'shipping' => $this->shippingFor($subtotal),
             'customer' => auth('web')->user(),
+            'methods' => $this->enabledPaymentMethods(),
         ]);
     }
 
@@ -37,13 +38,15 @@ class CheckoutController extends Controller
             return redirect()->route('cart.index')->with('status', 'Your cart is empty.');
         }
 
+        $allowed = array_keys($this->enabledPaymentMethods());
+
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255'],
             'phone' => ['required', 'string', 'max:40'],
             'address_line' => ['required', 'string', 'max:255'],
             'city' => ['required', 'string', 'max:120'],
-            'payment_method' => ['required', 'in:cod,bkash,nagad,card'],
+            'payment_method' => ['required', 'in:'.implode(',', $allowed)],
             'notes' => ['nullable', 'string', 'max:1000'],
         ]);
 
@@ -105,6 +108,24 @@ class CheckoutController extends Controller
         $order->load('items', 'customer');
 
         return view('storefront.confirmation', compact('order'));
+    }
+
+    /** Payment methods enabled in admin Settings (card is always available). */
+    protected function enabledPaymentMethods(): array
+    {
+        $methods = [];
+        if (SiteSetting::get('bkash_enabled', 1)) {
+            $methods['bkash'] = ['label' => 'bKash', 'sub' => 'Pay with your bKash wallet', 'color' => '#E2136E'];
+        }
+        if (SiteSetting::get('nagad_enabled', 1)) {
+            $methods['nagad'] = ['label' => 'Nagad', 'sub' => 'Instant mobile payment', 'color' => '#EE3A24'];
+        }
+        $methods['card'] = ['label' => 'Visa / Mastercard / Amex', 'sub' => 'Credit & debit cards', 'color' => '#1A1F71'];
+        if (SiteSetting::get('cod_enabled', 1)) {
+            $methods['cod'] = ['label' => 'Cash on Delivery', 'sub' => 'Pay when you receive it', 'color' => '#0A1A42'];
+        }
+
+        return $methods;
     }
 
     protected function shippingFor(float $subtotal): float

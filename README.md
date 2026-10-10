@@ -28,7 +28,9 @@ The design is rebuilt 1:1 from the HTML references in `design-reference/` (shipp
 - [x] **Step 4** — Storefront pages (Home, Category, Product, Cart, Checkout, Account)
       1:1 from the reference, wired to live data: session cart, coupons, real
       checkout → orders, customer auth (register/login/account)
-- [ ] Step 5 — `site_settings` → live storefront control (hero, logo, footer, socials, theme)
+- [x] **Step 5** — `site_settings` → live storefront control: hero, logo, footer,
+      socials, announcement, theme colours, store name, shipping, and payment-method
+      toggles all set in admin and read live by the storefront
 - [ ] Step 6 — Image upload wiring
 - [ ] Step 7 — Seed sample data
 

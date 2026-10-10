@@ -10,14 +10,23 @@
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('storefront/app.css') }}">
     <link rel="stylesheet" href="{{ asset('storefront/checkout.css') }}">
+    @php
+        use App\Models\SiteSetting;
+        $ss = SiteSetting::allValues();
+        $logo = ($ss['logo_path'] ?? null) ? asset('storage/'.$ss['logo_path']) : asset('images/storefront/3cb21dabe62909e3717bede6df8fb59a.jpg');
+        $total = $subtotal - $discount + $shipping;
+        $themeVars = collect([
+            '--navy' => $ss['theme_navy'] ?? null, '--blue' => $ss['theme_blue'] ?? null,
+            '--blue-bright' => $ss['theme_blue_bright'] ?? null, '--sale' => $ss['theme_sale'] ?? null,
+            '--paper' => $ss['theme_paper'] ?? null,
+        ])->filter()->map(fn ($v, $k) => "$k:$v")->implode(';');
+        $firstMethod = array_key_first($methods);
+    @endphp
+    @if ($themeVars)<style>:root{ {{ $themeVars }} }</style>@endif
     <script defer src="{{ asset('js/alpine.min.js') }}"></script>
 </head>
-@php
-    $logo = (\App\Models\SiteSetting::get('logo_path')) ? asset('storage/'.\App\Models\SiteSetting::get('logo_path')) : asset('images/storefront/3cb21dabe62909e3717bede6df8fb59a.jpg');
-    $total = $subtotal - $discount + $shipping;
-@endphp
 <body>
-<div class="vs" x-data="{ pm: 'cod' }">
+<div class="vs" x-data="{ pm: '{{ $firstMethod }}' }">
     <div class="util"><div class="wrap">
         <div class="util-l"><span><svg class="icon sm" viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"></path><path d="M9.5 12l1.8 1.8L15 10"></path></svg>Secure SSL Checkout</span><span><svg class="icon sm" viewBox="0 0 24 24"><path d="M3 7h11v8H3z"></path><path d="M14 10h4l3 3v2h-7z"></path></svg>Nationwide Delivery</span></div>
         <div class="util-r"><a href="{{ route('cart.index') }}">Back to Cart</a></div>
@@ -65,10 +74,9 @@
                         <div class="sub">All transactions are encrypted and secure.</div>
                         <input type="hidden" name="payment_method" :value="pm">
                         <div class="pays-list">
-                            <button :class="pm==='bkash' && 'on'" type="button" @click="pm='bkash'"><span class="rd"></span><span class="logo-chip" style="background:#E2136E">bKash</span><span class="name">bKash<small>Pay with your bKash wallet</small></span></button>
-                            <button :class="pm==='nagad' && 'on'" type="button" @click="pm='nagad'"><span class="rd"></span><span class="logo-chip" style="background:#EE3A24">Nagad</span><span class="name">Nagad<small>Instant mobile payment</small></span></button>
-                            <button :class="pm==='card' && 'on'" type="button" @click="pm='card'"><span class="rd"></span><span class="logo-chip" style="background:#1A1F71">CARD</span><span class="name">Visa / Mastercard / Amex<small>Credit &amp; debit cards</small></span></button>
-                            <button :class="pm==='cod' && 'on'" type="button" @click="pm='cod'"><span class="rd"></span><span class="logo-chip" style="background:#0A1A42">COD</span><span class="name">Cash on Delivery<small>Pay when you receive it</small></span></button>
+                            @foreach ($methods as $key => $m)
+                                <button :class="pm==='{{ $key }}' && 'on'" type="button" @click="pm='{{ $key }}'"><span class="rd"></span><span class="logo-chip" style="background:{{ $m['color'] }}">{{ strtoupper($key) }}</span><span class="name">{{ $m['label'] }}<small>{{ $m['sub'] }}</small></span></button>
+                            @endforeach
                         </div>
                     </div>
                 </div>
