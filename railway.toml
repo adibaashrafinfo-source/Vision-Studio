@@ -1,0 +1,23 @@
+# Railway deployment config for Vision Studio.
+#
+# This is for a QUICK, clickable preview before going live on cPanel —
+# the final production target is still cPanel + MySQL per the build spec.
+#
+# Setup (one time, in the Railway dashboard):
+#   1. New Project -> Deploy from GitHub repo -> select this repo.
+#   2. In the same project: + New -> Database -> Add MySQL.
+#   3. On the web service, open Variables and add the vars listed in
+#      RAILWAY-DEPLOY.md (DB_* copied from the MySQL plugin, APP_KEY, etc).
+#   4. Deploy. Open the generated *.up.railway.app URL.
+#
+# Railway's Nixpacks builder auto-detects PHP from composer.json and
+# installs dependencies; this file only overrides the start command so
+# migrations (and the admin seeder) run before the app serves traffic.
+
+[build]
+builder = "NIXPACKS"
+
+[deploy]
+startCommand = "php artisan storage:link; php artisan migrate --force --seed; php artisan serve --host 0.0.0.0 --port $PORT"
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3
