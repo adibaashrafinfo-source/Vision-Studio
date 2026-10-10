@@ -1,0 +1,6 @@
+# Ensures Railway/Nixpacks never installs dev-only Composer packages
+# (code style tools, test runners, etc.) for a production build — they
+# aren't needed to run the app and can carry stricter PHP-version
+# requirements than the app itself.
+[phases.install]
+cmds = ["composer install --no-dev --optimize-autoloader --no-scripts --no-interaction"]
