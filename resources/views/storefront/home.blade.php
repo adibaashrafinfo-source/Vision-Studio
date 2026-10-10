@@ -5,28 +5,32 @@
 @php
     use App\Models\SiteSetting;
     $s = SiteSetting::allValues();
-    $heroImg = ($s['hero_image'] ?? null) ? asset('storage/'.$s['hero_image']) : asset('images/storefront/85172a1c7dc613e91dd4e7982525e409.png');
-    $heroHeadline = $s['hero_headline'] ?? 'Premium Eyewear For a Clearer Tomorrow';
-    $heroSub = $s['hero_subheadline'] ?? 'Discover authentic frames, sunglasses and lenses from the brands you trust — with expert care and nationwide delivery.';
+    $heroImg = ($s['hero_image'] ?? null) ? asset('storage/'.$s['hero_image']) : asset('images/storefront/hero-photo-crop.png');
+    $heroHeadline = $s['hero_headline'] ?? 'See the World in a Better Way';
+    $heroSub = $s['hero_subheadline'] ?? 'Premium eyewear for your style, comfort and clearer vision. Discover eyeglasses, sunglasses, contact lenses and more.';
     $heroCtaText = $s['hero_cta_text'] ?? 'Shop Now';
     $heroCtaLink = $s['hero_cta_link'] ?? route('products.index');
 @endphp
 
 @section('content')
     {{-- Hero --}}
-    <section class="hero" id="top" style="background-image:url('{{ $heroImg }}')">
+    <section class="hero" id="top">
         <div class="wrap">
             <div>
-                <div class="eyebrow">Vision Studio</div>
+                <div class="eyebrow">Clearer Vision &middot; Brighter Tomorrow</div>
                 <h1>{{ $heroHeadline }}</h1>
                 <p class="lead">{{ $heroSub }}</p>
+                <div class="hero-trust">
+                    <span><svg class="icon sm" viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"></path><path d="M9.5 12l1.8 1.8L15 10"></path></svg>100% Authentic Products</span>
+                    <span><svg class="icon sm" viewBox="0 0 24 24"><path d="M3 7h11v8H3z"></path><path d="M14 10h4l3 3v2h-7z"></path><circle cx="7" cy="17" r="2"></circle><circle cx="17" cy="17" r="2"></circle></svg>Free Shipping Over ৳2,000</span>
+                    <span><svg class="icon sm" viewBox="0 0 24 24"><path d="M3 10a9 9 0 0 1 15-4l3 3"></path><path d="M21 4v5h-5"></path><path d="M21 14a9 9 0 0 1-15 4l-3-3"></path><path d="M3 20v-5h5"></path></svg>Easy Returns</span>
+                </div>
                 <div class="hero-cta">
-                    <a href="{{ $heroCtaLink }}" class="btn btn-primary">{{ $heroCtaText }}</a>
+                    <a href="{{ $heroCtaLink }}" class="btn btn-primary">{{ $heroCtaText }}<svg class="icon sm" viewBox="0 0 24 24" style="stroke:#fff"><path d="M5 12h14"></path><path d="M13 6l6 6-6 6"></path></svg></a>
                     <a href="{{ route('products.index') }}" class="btn btn-ghost">Browse Collection</a>
-                    <span class="note">Free shipping over ৳2,000</span>
                 </div>
             </div>
-            <div></div>
+            <div class="hero-photo"><img src="{{ $heroImg }}" alt="{{ $heroHeadline }}"></div>
         </div>
     </section>
 
