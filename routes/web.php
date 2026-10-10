@@ -14,18 +14,52 @@ use App\Http\Controllers\Admin\ReportsController;
 use App\Http\Controllers\Admin\ReviewsController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\WebsiteController;
+use App\Http\Controllers\Storefront\AccountController;
+use App\Http\Controllers\Storefront\Auth\CustomerLoginController;
+use App\Http\Controllers\Storefront\Auth\CustomerRegisterController;
+use App\Http\Controllers\Storefront\CartController;
+use App\Http\Controllers\Storefront\CheckoutController;
+use App\Http\Controllers\Storefront\HomeController;
+use App\Http\Controllers\Storefront\ProductController;
 use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
 | Storefront (public)
 |--------------------------------------------------------------------------
-| Storefront routes are added in Step 4. For now the root shows a holding
-| page so the app has a valid landing route.
 */
-Route::get('/', function () {
-    return view('welcome');
-})->name('home');
+Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/products', [ProductController::class, 'index'])->name('products.index');
+Route::get('/category/{category:slug}', [ProductController::class, 'category'])->name('category.show');
+Route::get('/product/{product:slug}', [ProductController::class, 'show'])->name('product.show');
+
+// Cart (session-based).
+Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
+Route::patch('/cart/{id}', [CartController::class, 'update'])->name('cart.update');
+Route::delete('/cart/{id}', [CartController::class, 'remove'])->name('cart.remove');
+Route::post('/cart/coupon', [CartController::class, 'applyCoupon'])->name('cart.coupon');
+Route::delete('/cart/coupon', [CartController::class, 'removeCoupon'])->name('cart.coupon.remove');
+
+// Checkout.
+Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
+Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
+Route::get('/order/confirmed/{order:order_no}', [CheckoutController::class, 'confirmation'])->name('checkout.confirmation');
+
+// Customer auth.
+Route::middleware('guest:web')->group(function () {
+    Route::get('/login', [CustomerLoginController::class, 'show'])->name('customer.login');
+    Route::post('/login', [CustomerLoginController::class, 'store'])->name('customer.login.attempt');
+    Route::get('/register', [CustomerRegisterController::class, 'show'])->name('customer.register');
+    Route::post('/register', [CustomerRegisterController::class, 'store'])->name('customer.register.attempt');
+});
+Route::post('/logout', [CustomerLoginController::class, 'destroy'])->name('customer.logout');
+
+// Account (requires a logged-in customer).
+Route::middleware('auth:web')->group(function () {
+    Route::get('/account', [AccountController::class, 'index'])->name('account');
+    Route::put('/account', [AccountController::class, 'update'])->name('account.update');
+});
 
 /*
 |--------------------------------------------------------------------------

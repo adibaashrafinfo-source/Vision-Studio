@@ -17,7 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 return route('admin.login');
             }
 
-            return route('home');
+            return route('customer.login');
         });
 
         // Send already-authenticated visitors away from guest-only pages.

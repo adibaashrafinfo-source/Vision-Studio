@@ -25,7 +25,9 @@ The design is rebuilt 1:1 from the HTML references in `design-reference/` (shipp
       navy shell (sidebar + topbar) and real controllers/CRUD: Dashboard, Orders,
       Products, Categories, Customers, Website, Marketing, Reports, Blog, Reviews,
       Coupons, Appearance, Settings
-- [ ] Step 4 — Storefront pages (Home, Category, Product, Cart, Checkout, Account)
+- [x] **Step 4** — Storefront pages (Home, Category, Product, Cart, Checkout, Account)
+      1:1 from the reference, wired to live data: session cart, coupons, real
+      checkout → orders, customer auth (register/login/account)
 - [ ] Step 5 — `site_settings` → live storefront control (hero, logo, footer, socials, theme)
 - [ ] Step 6 — Image upload wiring
 - [ ] Step 7 — Seed sample data
