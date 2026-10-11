@@ -14,7 +14,8 @@ class HomeController extends Controller
     {
         $categories = Category::active()->whereNull('parent_id')->orderBy('position')->limit(6)->get();
 
-        $active = Product::active()->with('primaryImage', 'category');
+        $active = Product::active()->with('primaryImage', 'category')
+            ->withCount('approvedReviews')->withAvg('approvedReviews', 'rating');
 
         // Flash sale = active products with a compare_price (on sale).
         $flash = (clone $active)->whereNotNull('compare_price')
@@ -25,15 +26,15 @@ class HomeController extends Controller
             ->whereNotNull('product_id')->groupBy('product_id')
             ->orderByDesc('sold')->limit(6)->pluck('product_id')->all();
 
-        $bestSellers = Product::active()->with('primaryImage', 'category')
+        $bestSellers = (clone $active)
             ->when($topIds, fn ($q) => $q->whereIn('id', $topIds))
             ->when(! $topIds, fn ($q) => $q->where('featured', true))
             ->get();
         if ($bestSellers->count() < 6) {
-            $bestSellers = Product::active()->with('primaryImage', 'category')->latest()->limit(6)->get();
+            $bestSellers = (clone $active)->latest()->limit(6)->get();
         }
 
-        $products = Product::active()->with('primaryImage', 'category')->latest()->limit(6)->get();
+        $products = (clone $active)->latest()->limit(6)->get();
 
         $brands = Product::active()->whereNotNull('brand')->distinct()->orderBy('brand')->pluck('brand')->take(8);
 

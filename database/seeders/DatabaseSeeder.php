@@ -13,7 +13,14 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             AdminSeeder::class,
-            // Sample catalog / orders / content are seeded in Step 7.
+            CategorySeeder::class,
+            ProductSeeder::class,
+            CustomerSeeder::class,
+            OrderSeeder::class,
+            ReviewSeeder::class,
+            CouponSeeder::class,
+            CampaignSeeder::class,
+            BlogPostSeeder::class,
         ]);
     }
 }

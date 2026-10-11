@@ -32,7 +32,7 @@ The design is rebuilt 1:1 from the HTML references in `design-reference/` (shipp
       socials, announcement, theme colours, store name, shipping, and payment-method
       toggles all set in admin and read live by the storefront
 - [x] Step 6 — Image upload wiring
-- [ ] Step 7 — Seed sample data
+- [x] Step 7 — Seed sample data
 
 ## Database schema
 

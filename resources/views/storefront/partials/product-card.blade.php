@@ -1,7 +1,8 @@
 @php
     $reviewsCount = $product->relationLoaded('approvedReviews') ? $product->approvedReviews->count() : $product->approved_reviews_count ?? null;
     $rating = $product->relationLoaded('approvedReviews') && $product->approvedReviews->count()
-        ? round($product->approvedReviews->avg('rating'), 1) : null;
+        ? round($product->approvedReviews->avg('rating'), 1)
+        : ($product->approved_reviews_avg_rating ? round($product->approved_reviews_avg_rating, 1) : null);
     $discount = $product->discount_percent;
 @endphp
 <div class="card">

@@ -22,7 +22,8 @@ class ProductController extends Controller
 
     protected function listing(Request $request, ?Category $category): View
     {
-        $query = Product::active()->with('primaryImage', 'category');
+        $query = Product::active()->with('primaryImage', 'category')
+            ->withCount('approvedReviews')->withAvg('approvedReviews', 'rating');
 
         if ($category) {
             $query->where('category_id', $category->id);
@@ -66,6 +67,7 @@ class ProductController extends Controller
         $product->load('images', 'variants', 'category', 'approvedReviews.customer');
 
         $related = Product::active()->with('primaryImage', 'category')
+            ->withCount('approvedReviews')->withAvg('approvedReviews', 'rating')
             ->where('category_id', $product->category_id)
             ->where('id', '!=', $product->id)
             ->limit(4)->get();
