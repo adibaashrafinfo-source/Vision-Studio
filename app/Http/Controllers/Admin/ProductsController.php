@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\ProductImage;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -90,6 +91,21 @@ class ProductsController extends Controller
         $product->update(['featured' => ! $product->featured]);
 
         return back()->with('status', $product->featured ? 'Marked as featured.' : 'Removed from featured.');
+    }
+
+    public function destroyImage(Product $product, ProductImage $image): RedirectResponse
+    {
+        abort_unless($image->product_id === $product->id, 404);
+
+        Storage::disk('public')->delete($image->image_path);
+        $wasPrimary = $image->is_primary;
+        $image->delete();
+
+        if ($wasPrimary) {
+            $product->images()->orderBy('position')->first()?->update(['is_primary' => true]);
+        }
+
+        return back()->with('status', 'Image removed.');
     }
 
     public function destroy(Product $product): RedirectResponse

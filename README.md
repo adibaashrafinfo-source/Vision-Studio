@@ -31,7 +31,7 @@ The design is rebuilt 1:1 from the HTML references in `design-reference/` (shipp
 - [x] **Step 5** — `site_settings` → live storefront control: hero, logo, footer,
       socials, announcement, theme colours, store name, shipping, and payment-method
       toggles all set in admin and read live by the storefront
-- [ ] Step 6 — Image upload wiring
+- [x] Step 6 — Image upload wiring
 - [ ] Step 7 — Seed sample data
 
 ## Database schema

@@ -60,6 +60,10 @@
                                 @foreach ($product->images ?? [] as $img)
                                     <div class="g {{ $img->is_primary ? 'main' : '' }}">
                                         <img class="pimg" src="{{ asset('storage/'.$img->image_path) }}" alt="">
+                                        <form method="POST" action="{{ route('admin.products.images.destroy', [$product, $img]) }}" onsubmit="return confirm('Remove this image?')" style="position:absolute;top:5px;right:5px;z-index:1">
+                                            @csrf @method('DELETE')
+                                            <button type="submit" title="Remove image" style="width:20px;height:20px;border-radius:50%;background:var(--surface);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--muted);cursor:pointer;line-height:1">✕</button>
+                                        </form>
                                     </div>
                                 @endforeach
                                 <template x-for="(src,i) in previews" :key="i"><div class="g"><img class="pimg" :src="src"></div></template>
