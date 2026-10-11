@@ -9,6 +9,14 @@ different (every host skins it a bit differently), the **icon name is the
 same everywhere** — search for it in the cPanel search box if you can't
 find it.
 
+> **You're on ExonHost — one thing to do first.** ExonHost runs standard
+> cPanel, so every step below applies as written. The one difference: on
+> ExonHost, **SSH/Terminal access is not turned on by default** — it's
+> granted on request. Before step 4, open a support ticket from your
+> ExonHost client area asking them to **"enable SSH access for my cPanel
+> account"**. This is usually free and takes them a few hours, not days —
+> do this first so it's ready by the time you need it.
+
 ---
 
 ## 0. Before you start — what your hosting plan needs
@@ -18,10 +26,9 @@ Open cPanel → **Software** section and confirm you have:
 - **PHP 8.2 or higher** (check under "Select PHP Version" / "MultiPHP Manager")
 - **MySQL** databases (under "MySQL® Databases")
 - **Terminal** or **SSH Access** (under "Advanced") — you need this to run a
-  few one-time commands. Almost all Bangladeshi business/reseller hosting
-  plans (ExonHost, Hostever, Exabytes, etc.) include this; if yours doesn't
-  show it, ask your host to enable it — it's usually a free toggle on their
-  side, not a plan upgrade.
+  few one-time commands. On ExonHost this is granted on request (see the
+  note above) rather than shown by default — if you don't see it yet,
+  that's expected until support enables it for you.
 - **Git™ Version Control** (under "Files") — optional but makes step 2 much
   easier.
 
