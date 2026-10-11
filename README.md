@@ -33,6 +33,7 @@ The design is rebuilt 1:1 from the HTML references in `design-reference/` (shipp
       toggles all set in admin and read live by the storefront
 - [x] Step 6 — Image upload wiring
 - [x] Step 7 — Seed sample data
+- [x] Step 8 — cPanel production deployment guide ([CPANEL-DEPLOY.md](./CPANEL-DEPLOY.md))
 
 ## Database schema
 
@@ -77,13 +78,8 @@ Two options, both documented step-by-step:
 Either way, uploaded images on that preview are **not persistent** — only
 the final cPanel deploy below stores them permanently.
 
-## Deployment checklist (cPanel)
+## Deployment (cPanel — production)
 
-1. Confirm the hosting plan has PHP 8.2+, MySQL, Composer / SSH, and "Setup PHP App".
-2. Create a MySQL database + user in cPanel and put the credentials in `.env`
-   (`DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`).
-3. Point the domain's document root at this project's `public/` folder.
-4. `composer install --no-dev --optimize-autoloader`
-5. `php artisan key:generate` (if `APP_KEY` is empty), then `php artisan migrate --seed`.
-6. `php artisan storage:link` so uploaded images are web-accessible.
-7. Set `APP_ENV=production` and `APP_DEBUG=false` before going live.
+Full step-by-step guide, written for cPanel specifically (MySQL setup,
+document root, Terminal commands, permissions, and a troubleshooting
+table): **[CPANEL-DEPLOY.md](./CPANEL-DEPLOY.md)**.
