@@ -63,6 +63,20 @@ After `php artisan migrate --seed`, sign in at **`/admin/login`** with the seede
 Super Admin (defaults: `admin@visionstudio.test` / `password` — override via the
 `ADMIN_*` vars in `.env`). Create more admins with `php artisan vision:make-admin`.
 
+## Quick live preview (before cPanel)
+
+Want a clickable link to review the design before the final cPanel deploy?
+Two options, both documented step-by-step:
+
+- **[VERCEL-DEPLOY.md](./VERCEL-DEPLOY.md)** — runs as a Docker container
+  (PHP 8.2 + FrankenPHP); the Dockerfile was built and smoke-tested locally
+  before being committed.
+- **[RAILWAY-DEPLOY.md](./RAILWAY-DEPLOY.md)** — simpler Nixpacks-based PHP
+  build, no Dockerfile involved.
+
+Either way, uploaded images on that preview are **not persistent** — only
+the final cPanel deploy below stores them permanently.
+
 ## Deployment checklist (cPanel)
 
 1. Confirm the hosting plan has PHP 8.2+, MySQL, Composer / SSH, and "Setup PHP App".

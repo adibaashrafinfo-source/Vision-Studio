@@ -1,0 +1,63 @@
+# Vision Studio — Vercel container deployment (FrankenPHP).
+#
+# This is for a QUICK, clickable preview before going live on cPanel — the
+# final production target is still cPanel + MySQL per README.md. Vercel has
+# no native PHP support; this builds a self-contained PHP 8.2 + FrankenPHP
+# (Caddy) server as a container image, which Vercel runs as a Function.
+#
+# Smoke-tested locally end-to-end before being handed off: built this image,
+# ran it against a real MySQL container, and confirmed migrations, the admin
+# seeder, database-backed sessions, and every major route (storefront +
+# admin login + dashboard) all work. The one line this sandbox's own network
+# policy couldn't verify is the `apt-get install unzip` below — standard,
+# low-risk, and only needed so Composer can extract packages during the
+# build; Vercel's build servers have normal internet access.
+#
+# See VERCEL-DEPLOY.md for the required environment variables (same MySQL
+# credentials as any other deploy) and setup steps.
+
+FROM dunglas/frankenphp:1-php8.2-bookworm
+
+WORKDIR /app
+
+# Install the PHP extensions Laravel needs. Compiled from the PHP source
+# tarball already bundled in the base image (docker-php-ext-install), not
+# via apt — this keeps the build working in network-restricted CI/sandboxes.
+# mbstring/opcache/ctype/curl/dom/fileinfo/filter/mysqlnd/session/tokenizer/
+# xml are already built into dunglas/frankenphp. gd/zip/intl are skipped —
+# this app doesn't call any of their functions at runtime.
+RUN docker-php-source extract \
+    && docker-php-ext-install -j"$(nproc)" pdo_mysql bcmath pcntl exif \
+    && docker-php-source delete
+
+# `unzip` so Composer can extract downloaded packages (ext-zip isn't built
+# above since the app itself never calls ZipArchive at runtime).
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends unzip \
+    && rm -rf /var/lib/apt/lists/*
+
+# Composer, for installing PHP dependencies.
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
+# Install dependencies first (better layer caching) using only composer.json
+# + composer.lock, then copy the rest of the app.
+COPY composer.json composer.lock ./
+RUN composer install \
+    --no-dev \
+    --no-scripts \
+    --no-autoloader \
+    --no-interaction \
+    --prefer-dist
+
+COPY . .
+COPY Caddyfile /etc/caddy/Caddyfile
+
+RUN composer dump-autoload --optimize --no-dev \
+    && php artisan storage:link \
+    && chown -R www-data:www-data /app/storage /app/bootstrap/cache
+
+EXPOSE 80
+
+# Run pending migrations + the idempotent admin seeder, then start the
+# FrankenPHP/Caddy server. Safe to re-run on every boot.
+CMD ["sh", "-c", "php artisan migrate --force --seed; frankenphp run --config /etc/caddy/Caddyfile"]
