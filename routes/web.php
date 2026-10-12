@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\ReportsController;
 use App\Http\Controllers\Admin\ReviewsController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\WebsiteController;
+use App\Http\Controllers\DeployWebhookController;
 use App\Http\Controllers\Storefront\AccountController;
 use App\Http\Controllers\Storefront\Auth\CustomerLoginController;
 use App\Http\Controllers\Storefront\Auth\CustomerRegisterController;
@@ -60,6 +61,10 @@ Route::middleware('auth:web')->group(function () {
     Route::get('/account', [AccountController::class, 'index'])->name('account');
     Route::put('/account', [AccountController::class, 'update'])->name('account.update');
 });
+
+// GitHub push webhook — see DEPLOY-WEBHOOK.md. Signature-verified inside
+// the controller, so this is safe to leave public.
+Route::post('/deploy-webhook', [DeployWebhookController::class, 'handle'])->name('deploy.webhook');
 
 /*
 |--------------------------------------------------------------------------

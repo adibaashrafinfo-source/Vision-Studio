@@ -28,6 +28,10 @@ return Application::configure(basePath: dirname(__DIR__))
 
             return route('home');
         });
+
+        // GitHub's webhook POST has no session/CSRF token — it's verified
+        // by HMAC signature inside DeployWebhookController instead.
+        $middleware->validateCsrfTokens(except: ['deploy-webhook']);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

@@ -34,6 +34,7 @@ The design is rebuilt 1:1 from the HTML references in `design-reference/` (shipp
 - [x] Step 6 — Image upload wiring
 - [x] Step 7 — Seed sample data
 - [x] Step 8 — cPanel production deployment guide ([CPANEL-DEPLOY.md](./CPANEL-DEPLOY.md))
+- [x] Step 9 — GitHub push → auto-deploy webhook ([DEPLOY-WEBHOOK.md](./DEPLOY-WEBHOOK.md))
 
 ## Database schema
 
@@ -83,3 +84,7 @@ the final cPanel deploy below stores them permanently.
 Full step-by-step guide, written for cPanel specifically (MySQL setup,
 document root, Terminal commands, permissions, and a troubleshooting
 table): **[CPANEL-DEPLOY.md](./CPANEL-DEPLOY.md)**.
+
+Want `git push` to update the live site automatically, with no manual
+redeploy step? **[DEPLOY-WEBHOOK.md](./DEPLOY-WEBHOOK.md)** sets up a
+GitHub webhook that redeploys on every push to `main`.
