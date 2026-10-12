@@ -2,12 +2,18 @@
 
 namespace App\Models;
 
+use App\Notifications\CustomerResetPassword;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 class Customer extends Authenticatable
 {
     use Notifiable;
+
+    public function sendPasswordResetNotification($token): void
+    {
+        $this->notify(new CustomerResetPassword($token));
+    }
 
     protected $fillable = [
         'name',

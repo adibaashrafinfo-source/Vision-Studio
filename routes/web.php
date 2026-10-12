@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\Auth\LoginController as AdminLoginController;
+use App\Http\Controllers\Admin\Auth\PasswordResetController as AdminPasswordResetController;
 use App\Http\Controllers\Admin\AppearanceController;
 use App\Http\Controllers\Admin\BlogController;
 use App\Http\Controllers\Admin\CategoriesController;
@@ -18,10 +19,16 @@ use App\Http\Controllers\DeployWebhookController;
 use App\Http\Controllers\Storefront\AccountController;
 use App\Http\Controllers\Storefront\Auth\CustomerLoginController;
 use App\Http\Controllers\Storefront\Auth\CustomerRegisterController;
+use App\Http\Controllers\Storefront\Auth\PasswordResetController as CustomerPasswordResetController;
 use App\Http\Controllers\Storefront\CartController;
 use App\Http\Controllers\Storefront\CheckoutController;
 use App\Http\Controllers\Storefront\HomeController;
+use App\Http\Controllers\Storefront\NewsletterController;
+use App\Http\Controllers\Storefront\PageController;
 use App\Http\Controllers\Storefront\ProductController;
+use App\Http\Controllers\Storefront\ReviewController;
+use App\Http\Controllers\Storefront\SitemapController;
+use App\Http\Controllers\Storefront\WishlistController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -33,6 +40,22 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
 Route::get('/category/{category:slug}', [ProductController::class, 'category'])->name('category.show');
 Route::get('/product/{product:slug}', [ProductController::class, 'show'])->name('product.show');
+Route::post('/product/{product:slug}/review', [ReviewController::class, 'store'])->name('product.review.store');
+
+// Static content pages.
+Route::get('/faq', [PageController::class, 'faq'])->name('faq');
+Route::get('/shipping-delivery', [PageController::class, 'shipping'])->name('shipping');
+Route::get('/returns-refunds', [PageController::class, 'returns'])->name('returns');
+Route::get('/privacy-policy', [PageController::class, 'privacy'])->name('privacy');
+Route::get('/terms-of-service', [PageController::class, 'terms'])->name('terms');
+Route::get('/stores', [PageController::class, 'stores'])->name('stores');
+Route::get('/help', [PageController::class, 'help'])->name('help');
+
+// Newsletter signup.
+Route::post('/newsletter', [NewsletterController::class, 'subscribe'])->name('newsletter.subscribe');
+
+// SEO.
+Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 
 // Cart (session-based).
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
@@ -41,6 +64,11 @@ Route::patch('/cart/{id}', [CartController::class, 'update'])->name('cart.update
 Route::delete('/cart/{id}', [CartController::class, 'remove'])->name('cart.remove');
 Route::post('/cart/coupon', [CartController::class, 'applyCoupon'])->name('cart.coupon');
 Route::delete('/cart/coupon', [CartController::class, 'removeCoupon'])->name('cart.coupon.remove');
+
+// Wishlist (session-backed, same as cart).
+Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist.index');
+Route::post('/wishlist/{product}', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
+Route::delete('/wishlist/{product}', [WishlistController::class, 'remove'])->name('wishlist.remove');
 
 // Checkout.
 Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
@@ -53,6 +81,11 @@ Route::middleware('guest:web')->group(function () {
     Route::post('/login', [CustomerLoginController::class, 'store'])->name('customer.login.attempt');
     Route::get('/register', [CustomerRegisterController::class, 'show'])->name('customer.register');
     Route::post('/register', [CustomerRegisterController::class, 'store'])->name('customer.register.attempt');
+
+    Route::get('/forgot-password', [CustomerPasswordResetController::class, 'requestForm'])->name('customer.password.request');
+    Route::post('/forgot-password', [CustomerPasswordResetController::class, 'sendLink'])->name('customer.password.email');
+    Route::get('/reset-password/{token}', [CustomerPasswordResetController::class, 'resetForm'])->name('customer.password.reset');
+    Route::post('/reset-password', [CustomerPasswordResetController::class, 'reset'])->name('customer.password.update');
 });
 Route::post('/logout', [CustomerLoginController::class, 'destroy'])->name('customer.logout');
 
@@ -77,6 +110,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::middleware('guest:admin')->group(function () {
         Route::get('login', [AdminLoginController::class, 'show'])->name('login');
         Route::post('login', [AdminLoginController::class, 'store'])->name('login.attempt');
+
+        Route::get('forgot-password', [AdminPasswordResetController::class, 'requestForm'])->name('password.request');
+        Route::post('forgot-password', [AdminPasswordResetController::class, 'sendLink'])->name('password.email');
+        Route::get('reset-password/{token}', [AdminPasswordResetController::class, 'resetForm'])->name('password.reset');
+        Route::post('reset-password', [AdminPasswordResetController::class, 'reset'])->name('password.update');
     });
 
     // Authenticated admin routes.

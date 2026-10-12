@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Storefront;
 
 use App\Http\Controllers\Controller;
+use App\Mail\OrderAdminNotification;
+use App\Mail\OrderPlaced;
 use App\Models\Customer;
 use App\Models\Order;
 use App\Models\SiteSetting;
@@ -10,6 +12,9 @@ use App\Support\Cart;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class CheckoutController extends Controller
@@ -56,12 +61,26 @@ class CheckoutController extends Controller
         $discount = Cart::discount();
         $coupon = Cart::coupon();
 
-        $order = DB::transaction(function () use ($data, $items, $subtotal, $shipping, $discount, $coupon) {
+        $isNewAccount = false;
+
+        $order = DB::transaction(function () use ($data, $items, $subtotal, $shipping, $discount, $coupon, &$isNewAccount) {
             // Attach to the logged-in customer, or find/create one by email.
-            $customer = auth('web')->user() ?? Customer::firstOrCreate(
-                ['email' => $data['email']],
-                ['name' => $data['name'], 'phone' => $data['phone'], 'status' => 'active']
-            );
+            // Guest-checkout accounts get a random hashed password so they can
+            // later claim the account via the Forgot Password flow.
+            $customer = auth('web')->user();
+            if (! $customer) {
+                $customer = Customer::where('email', $data['email'])->first();
+                if (! $customer) {
+                    $customer = Customer::create([
+                        'email' => $data['email'],
+                        'name' => $data['name'],
+                        'phone' => $data['phone'],
+                        'password' => Str::random(32),
+                        'status' => 'active',
+                    ]);
+                    $isNewAccount = true;
+                }
+            }
 
             // Keep a default address on file.
             $customer->addresses()->firstOrCreate(
@@ -100,7 +119,23 @@ class CheckoutController extends Controller
 
         Cart::clear();
 
+        $this->sendOrderEmails($order, $isNewAccount);
+
         return redirect()->route('checkout.confirmation', $order)->with('status', 'Order placed successfully!');
+    }
+
+    protected function sendOrderEmails(Order $order, bool $isNewAccount): void
+    {
+        try {
+            Mail::to($order->customer->email)->send((new OrderPlaced($order))->with(['isNewAccount' => $isNewAccount]));
+
+            if ($adminEmail = SiteSetting::get('order_notification_email') ?: config('mail.from.address')) {
+                Mail::to($adminEmail)->send(new OrderAdminNotification($order));
+            }
+        } catch (\Throwable $e) {
+            // Never fail an order over a mail hiccup — SMTP outages happen.
+            Log::warning('Order email failed for #'.$order->order_no.': '.$e->getMessage());
+        }
     }
 
     public function confirmation(Order $order): View

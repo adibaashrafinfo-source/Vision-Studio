@@ -21,7 +21,25 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'Premium Eyewear')  · {{ $appName }}</title>
+    @php
+        $metaTitle = (View::getSection('title') ?? 'Premium Eyewear').' · '.$appName;
+        $metaDesc = trim(View::yieldContent('metaDescription') ?: ($s['site_description'] ?? 'Premium eyewear for Bangladesh — authentic Ray-Ban, Oakley, prescription glasses, sunglasses and contact lenses. Nationwide delivery, 7-day returns.'));
+        $metaImage = ($s['hero_image'] ?? null) ? asset('storage/'.$s['hero_image']) : asset('images/storefront/85172a1c7dc613e91dd4e7982525e409.png');
+        $canonical = url()->current();
+    @endphp
+    <title>{{ $metaTitle }}</title>
+    <meta name="description" content="{{ $metaDesc }}">
+    <link rel="canonical" href="{{ $canonical }}">
+    <meta property="og:type" content="@yield('ogType', 'website')">
+    <meta property="og:site_name" content="{{ $appName }}">
+    <meta property="og:title" content="{{ $metaTitle }}">
+    <meta property="og:description" content="{{ $metaDesc }}">
+    <meta property="og:url" content="{{ $canonical }}">
+    <meta property="og:image" content="{{ $metaImage }}">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ $metaTitle }}">
+    <meta name="twitter:description" content="{{ $metaDesc }}">
+    <meta name="twitter:image" content="{{ $metaImage }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -49,8 +67,8 @@
             </div>
             <div class="util-r">
                 <a href="{{ route('account') }}">Track Order</a>
-                <a href="#stores">Store Locator</a>
-                <a href="#help">Need Help?</a>
+                <a href="{{ route('stores') }}">Store Locator</a>
+                <a href="{{ route('help') }}">Need Help?</a>
             </div>
         </div>
     </div>
@@ -69,9 +87,11 @@
                     <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"></circle><path d="M4 20c0-4 4-6 8-6s8 2 8 6"></path></svg>
                     <span>{{ $customer ? 'Account' : 'Sign in' }}</span>
                 </a>
-                <a href="{{ route('account') }}" class="iconbtn" aria-label="Wishlist">
+                @php $wishlistCount = \App\Support\Wishlist::count(); @endphp
+                <a href="{{ route('wishlist.index') }}" class="iconbtn" aria-label="Wishlist">
                     <svg class="icon" viewBox="0 0 24 24"><path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"></path></svg>
                     <span>Wishlist</span>
+                    @if ($wishlistCount)<span class="badge">{{ $wishlistCount }}</span>@endif
                 </a>
                 <a href="{{ route('cart.index') }}" class="iconbtn" aria-label="Cart">
                     <svg class="icon" viewBox="0 0 24 24"><path d="M6 6h15l-1.5 9h-12z"></path><path d="M6 6L5 3H2"></path><circle cx="9" cy="20" r="1.5"></circle><circle cx="18" cy="20" r="1.5"></circle></svg>
@@ -122,9 +142,11 @@
                     <h4>Customer Service</h4>
                     <ul class="foot-links">
                         <li><a href="{{ route('account') }}">Track Your Order</a></li>
-                        <li><a href="#shipping">Shipping &amp; Delivery</a></li>
-                        <li><a href="#returns">Returns &amp; Refunds</a></li>
-                        <li><a href="#faq">FAQ</a></li>
+                        <li><a href="{{ route('shipping') }}">Shipping &amp; Delivery</a></li>
+                        <li><a href="{{ route('returns') }}">Returns &amp; Refunds</a></li>
+                        <li><a href="{{ route('faq') }}">FAQ</a></li>
+                        <li><a href="{{ route('privacy') }}">Privacy Policy</a></li>
+                        <li><a href="{{ route('terms') }}">Terms of Service</a></li>
                     </ul>
                 </div>
                 <div>

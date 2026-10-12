@@ -1,6 +1,8 @@
 @extends('layouts.storefront')
 
 @section('title', $product->name)
+@section('metaDescription', Str::limit($product->short_desc ?: $product->long_desc ?: $product->name.' available at '.config('app.name').'.', 160))
+@section('ogType', 'product')
 
 @push('styles')<link rel="stylesheet" href="{{ asset('storefront/product.css') }}">@endpush
 
@@ -71,7 +73,8 @@
                         <svg class="icon sm" viewBox="0 0 24 24" style="stroke:#fff"><path d="M6 6h15l-1.5 9h-12z"></path><path d="M6 6L5 3H2"></path><circle cx="9" cy="20" r="1.5"></circle><circle cx="18" cy="20" r="1.5"></circle></svg>
                         Add to Cart — <span x-text="money(price*qty)"></span>
                     </button>
-                    <button type="button" class="wish" aria-label="Add to wishlist"><svg class="icon" viewBox="0 0 24 24"><path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"></path></svg></button>
+                    @php $inWishlist = \App\Support\Wishlist::has($product->id); @endphp
+                    <form method="POST" action="{{ route('wishlist.toggle', $product) }}" style="margin:0;display:inline">@csrf<button type="submit" class="wish" aria-label="{{ $inWishlist ? 'Remove from' : 'Add to' }} wishlist" style="{{ $inWishlist ? 'background:var(--sale);color:#fff;border-color:var(--sale)' : '' }}"><svg class="icon" viewBox="0 0 24 24" style="{{ $inWishlist ? 'fill:#fff;stroke:#fff' : '' }}"><path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"></path></svg></button></form>
                 </div>
             </form>
 
@@ -103,6 +106,10 @@
             <div class="k">Warranty</div><div class="v">1 Year Brand Warranty</div>
         </div>
         <div class="tabpanel" x-show="tab==='rev'" style="display:none;max-width:720px">
+            @if (session('status') && str_contains(session('status'), 'review'))
+                <div style="background:#f0fdf4;border-left:3px solid #16a34a;border-radius:10px;padding:11px 14px;margin-bottom:18px;color:#166534;font-size:13px">{{ session('status') }}</div>
+            @endif
+
             @forelse ($product->approvedReviews as $review)
                 <div class="rev">
                     <div class="top">
@@ -115,6 +122,35 @@
             @empty
                 <p class="sec-sub">No reviews yet. Be the first to review this product.</p>
             @endforelse
+
+            {{-- Write a review --}}
+            <div style="margin-top:28px;padding-top:24px;border-top:1px solid var(--line)">
+                <h3 style="font-size:18px;margin:0 0 14px">Write a review</h3>
+                @auth('web')
+                    @if ($errors->any())
+                        <div style="background:#fef2f2;border-left:3px solid var(--sale);border-radius:10px;padding:11px 14px;margin-bottom:14px;font-size:13px;color:var(--sale)">
+                            <ul style="margin:0;padding-left:18px">@foreach ($errors->all() as $e)<li>{{ $e }}</li>@endforeach</ul>
+                        </div>
+                    @endif
+                    <form method="POST" action="{{ route('product.review.store', $product) }}" x-data="{ rating: {{ old('rating', 5) }} }">
+                        @csrf
+                        <div style="margin-bottom:12px">
+                            <label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px">Your rating</label>
+                            <div style="display:inline-flex;gap:4px;cursor:pointer">
+                                <template x-for="n in 5" :key="n">
+                                    <svg @click="rating=n" class="icon" viewBox="0 0 24 24" style="cursor:pointer;width:26px;height:26px" :style="`stroke:${n<=rating?'var(--sale)':'var(--muted)'};fill:${n<=rating?'var(--sale)':'none'}`"><path d="M12 3l2.6 5.5 6 .8-4.3 4.2 1 6-5.3-2.9-5.3 2.9 1-6L3.4 9.3l6-.8z"></path></svg>
+                                </template>
+                            </div>
+                            <input type="hidden" name="rating" x-model="rating">
+                        </div>
+                        <div style="margin-bottom:12px"><label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px">Title (optional)</label><input name="title" value="{{ old('title') }}" maxlength="120" placeholder="Short summary" style="width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-family:var(--ui)"></div>
+                        <div style="margin-bottom:14px"><label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px">Your review</label><textarea name="comment" required maxlength="2000" style="width:100%;min-height:100px;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-family:var(--ui)" placeholder="Share your experience with this product">{{ old('comment') }}</textarea></div>
+                        <button type="submit" class="btn btn-primary">Submit review</button>
+                    </form>
+                @else
+                    <p class="sec-sub"><a href="{{ route('customer.login') }}">Sign in</a> to write a review.</p>
+                @endauth
+            </div>
         </div>
     </div>
 

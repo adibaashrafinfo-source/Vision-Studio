@@ -169,10 +169,15 @@
                     <p>Join the Vision Studio list for new arrivals, exclusive offers and eye-care tips.</p>
                     <label class="consent"><input type="checkbox"> I agree to receive marketing emails from Vision Studio.</label>
                 </div>
-                <form class="news-form" onsubmit="return false">
-                    <input type="email" aria-label="Email address" placeholder="your@email.com">
+                @if (session('status') && str_contains(strtolower(session('status')), 'subscrib'))
+                    <div style="background:#f0fdf4;border-left:3px solid #16a34a;border-radius:10px;padding:11px 14px;margin-bottom:12px;color:#166534;font-size:13px">{{ session('status') }}</div>
+                @endif
+                <form class="news-form" method="POST" action="{{ route('newsletter.subscribe') }}">
+                    @csrf
+                    <input type="email" name="email" aria-label="Email address" placeholder="your@email.com" required>
                     <button type="submit" class="btn btn-primary">Subscribe</button>
                 </form>
+                @error('email')<p style="color:var(--sale);font-size:12px;margin-top:6px">{{ $message }}</p>@enderror
             </div>
         </div>
     </section>

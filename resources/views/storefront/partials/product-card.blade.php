@@ -4,9 +4,13 @@
         ? round($product->approvedReviews->avg('rating'), 1)
         : ($product->approved_reviews_avg_rating ? round($product->approved_reviews_avg_rating, 1) : null);
     $discount = $product->discount_percent;
+    $inWishlist = \App\Support\Wishlist::has($product->id);
 @endphp
 <div class="card">
-    <button class="heart" type="button" aria-label="Add to wishlist"><svg class="icon" viewBox="0 0 24 24"><path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"></path></svg></button>
+    <form method="POST" action="{{ route('wishlist.toggle', $product) }}" style="position:absolute;top:10px;right:10px;z-index:2;margin:0">
+        @csrf
+        <button class="heart" type="submit" aria-label="{{ $inWishlist ? 'Remove from' : 'Add to' }} wishlist" style="background:{{ $inWishlist ? 'var(--sale)' : 'transparent' }};color:{{ $inWishlist ? '#fff' : 'inherit' }}"><svg class="icon" viewBox="0 0 24 24" style="{{ $inWishlist ? 'fill:#fff;stroke:#fff' : '' }}"><path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"></path></svg></button>
+    </form>
     @if ($discount)
         <span class="ptag" style="background:var(--sale)">-{{ $discount }}%</span>
     @elseif ($product->featured)
