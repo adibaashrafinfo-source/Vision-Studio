@@ -74,8 +74,11 @@
     </div>
 
     {{-- Nav --}}
-    <div class="nav">
+    <div class="nav" x-data="{ mobileOpen:false }">
         <div class="wrap">
+            <button type="button" class="hamburger" @click="mobileOpen=!mobileOpen" :aria-expanded="mobileOpen.toString()" aria-label="Toggle menu">
+                <span></span><span></span><span></span>
+            </button>
             <a href="{{ route('home') }}" class="logo" aria-label="{{ $appName }} home"><img src="{{ $logo }}" alt="{{ $appName }}"></a>
             <form class="search" action="{{ route('products.index') }}" method="GET">
                 <svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4-4"></path></svg>
@@ -99,6 +102,24 @@
                     @if ($cartCount)<span class="badge">{{ $cartCount }}</span>@endif
                 </a>
             </div>
+        </div>
+
+        {{-- Mobile slide-down menu --}}
+        <div class="mobile-menu" x-show="mobileOpen" x-transition x-cloak @click.outside="mobileOpen=false">
+            <form class="mobile-search" action="{{ route('products.index') }}" method="GET">
+                <svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4-4"></path></svg>
+                <input type="search" name="q" value="{{ request('q') }}" placeholder="Search products…">
+            </form>
+            <a href="{{ route('home') }}" class="{{ request()->routeIs('home') ? 'active' : '' }}">Home</a>
+            @foreach ($navCats as $cat)
+                <a href="{{ route('category.show', $cat) }}">{{ $cat->name }}</a>
+            @endforeach
+            <a href="{{ route('products.index') }}">All Products</a>
+            <a href="{{ route('products.index', ['sort' => 'price_low']) }}" style="color:var(--sale);font-weight:700">Special Sale</a>
+            <div class="mobile-menu-divider"></div>
+            <a href="{{ $customer ? route('account') : route('customer.login') }}">{{ $customer ? 'My Account' : 'Sign In' }}</a>
+            <a href="{{ route('wishlist.index') }}">Wishlist @if ($wishlistCount)<span class="badge" style="position:static;margin-left:6px">{{ $wishlistCount }}</span>@endif</a>
+            <a href="{{ route('cart.index') }}">Cart @if ($cartCount)<span class="badge" style="position:static;margin-left:6px">{{ $cartCount }}</span>@endif</a>
         </div>
     </div>
     <div class="catnav">
@@ -171,7 +192,65 @@
             </div>
         </div>
     </footer>
+
+    {{-- Quick View modal --}}
+    <div x-data="{ show:false, p:null }" x-init="window.addEventListener('quick-view', e => { p = e.detail; show = true })" x-show="show" x-cloak
+         style="position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;padding:20px">
+        <div x-show="show" x-transition.opacity @click="show=false" style="position:absolute;inset:0;background:rgba(10,18,40,.6)"></div>
+        <div x-show="show" x-transition.scale.95 class="qv-modal" @click.outside="show=false" style="position:relative" x-cloak>
+            <button type="button" class="qv-close" @click="show=false" aria-label="Close">&times;</button>
+            <template x-if="p">
+                <div class="qv-body">
+                    <div class="qv-img">
+                        <template x-if="p.image"><img :src="p.image" :alt="p.name"></template>
+                        <template x-if="!p.image"><svg class="glass" viewBox="0 0 200 90" style="width:60%"><circle cx="100" cy="45" r="30"></circle><circle cx="100" cy="45" r="8"></circle></svg></template>
+                    </div>
+                    <div class="qv-info">
+                        <span class="cat" x-text="p.category"></span>
+                        <h3 x-text="p.name"></h3>
+                        <div class="rating"><svg class="icon" viewBox="0 0 24 24"><path d="M12 3l2.6 5.5 6 .8-4.3 4.2 1 6-5.3-2.9-5.3 2.9 1-6L3.4 9.3l6-.8z"></path></svg><b x-text="p.rating"></b><span>(<span x-text="p.reviewsCount"></span>)</span></div>
+                        <div class="qv-price">
+                            <span class="now tnum" x-text="'৳'+Number(p.price).toLocaleString('en-IN')"></span>
+                            <template x-if="p.comparePrice"><span class="was tnum" x-text="'৳'+Number(p.comparePrice).toLocaleString('en-IN')"></span></template>
+                        </div>
+                        <template x-if="!p.inStock"><p style="color:var(--sale);font-weight:600;font-size:13px">Out of stock</p></template>
+                        <form method="POST" :action="`{{ url('/cart/add') }}`" style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">
+                            <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                            <input type="hidden" name="product_id" :value="p.productId">
+                            <button type="submit" class="btn btn-primary" :disabled="!p.inStock">Add to Cart</button>
+                            <a :href="p.url" class="btn btn-ghost">View Full Details</a>
+                        </form>
+                    </div>
+                </div>
+            </template>
+        </div>
+    </div>
+
+    {{-- WhatsApp floating button --}}
+    @php $waNumber = preg_replace('/\D/', '', $s['whatsapp_number'] ?? $s['footer_phone'] ?? '+8801719686459'); @endphp
+    <a href="https://wa.me/{{ $waNumber }}" target="_blank" rel="noopener" class="wa-float" aria-label="Chat on WhatsApp">
+        <span class="wa-ping"></span>
+        <svg viewBox="0 0 32 32" width="30" height="30" fill="#fff"><path d="M16.02 3C9.4 3 4 8.4 4 15.02c0 2.6.8 5 2.2 7L4.5 29l7.2-1.9c1.9 1 4.1 1.6 6.3 1.6 6.6 0 12-5.4 12-12.02C30 8.4 24.6 3 16.02 3zm0 22c-1.9 0-3.7-.5-5.3-1.4l-.4-.2-4.3 1.1 1.1-4.2-.2-.4c-1-1.6-1.5-3.5-1.5-5.4 0-5.5 4.5-10 10-10s10 4.5 10 10-4.4 10.5-9.4 10.5zm5.6-7.5c-.3-.1-1.8-.9-2.1-1-.3-.1-.5-.1-.7.1-.2.3-.8 1-1 1.2-.2.2-.4.2-.7.1-.3-.1-1.4-.5-2.6-1.6-1-.9-1.6-2-1.8-2.3-.2-.3 0-.5.1-.6.1-.1.3-.4.4-.5.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5 0-.1-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.4s1.1 2.8 1.2 3c.1.2 2.1 3.2 5.1 4.4.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.8-.7 2-1.4.3-.7.3-1.3.2-1.4-.1-.2-.3-.2-.6-.4z"></path></svg>
+    </a>
 </div>
 @stack('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var targets = document.querySelectorAll('[data-animate]');
+    if (!('IntersectionObserver' in window) || !targets.length) {
+        targets.forEach(function (el) { el.classList.add('is-visible'); });
+        return;
+    }
+    var observer = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+    targets.forEach(function (el) { observer.observe(el); });
+});
+</script>
 </body>
 </html>

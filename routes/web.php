@@ -70,10 +70,13 @@ Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist.in
 Route::post('/wishlist/{product}', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
 Route::delete('/wishlist/{product}', [WishlistController::class, 'remove'])->name('wishlist.remove');
 
-// Checkout.
-Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
-Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
-Route::get('/order/confirmed/{order:order_no}', [CheckoutController::class, 'confirmation'])->name('checkout.confirmation');
+// Checkout — sign-in required (no guest orders).
+Route::middleware('auth:web')->group(function () {
+    Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
+    Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
+    Route::post('/checkout/buy-now', [CheckoutController::class, 'buyNow'])->name('checkout.buy-now');
+    Route::get('/order/confirmed/{order:order_no}', [CheckoutController::class, 'confirmation'])->name('checkout.confirmation');
+});
 
 // Customer auth.
 Route::middleware('guest:web')->group(function () {

@@ -6,7 +6,7 @@
     $discount = $product->discount_percent;
     $inWishlist = \App\Support\Wishlist::has($product->id);
 @endphp
-<div class="card">
+<div class="card" x-data="{}">
     <form method="POST" action="{{ route('wishlist.toggle', $product) }}" style="position:absolute;top:10px;right:10px;z-index:2;margin:0">
         @csrf
         <button class="heart" type="submit" aria-label="{{ $inWishlist ? 'Remove from' : 'Add to' }} wishlist" style="background:{{ $inWishlist ? 'var(--sale)' : 'transparent' }};color:{{ $inWishlist ? '#fff' : 'inherit' }}"><svg class="icon" viewBox="0 0 24 24" style="{{ $inWishlist ? 'fill:#fff;stroke:#fff' : '' }}"><path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"></path></svg></button>
@@ -16,13 +16,30 @@
     @elseif ($product->featured)
         <span class="ptag">Bestseller</span>
     @endif
-    <a href="{{ route('product.show', $product) }}" class="img">
-        @if ($product->primaryImage)
-            <img class="pimg" src="{{ asset('storage/'.$product->primaryImage->image_path) }}" alt="{{ $product->name }}">
-        @else
-            <svg class="glass" viewBox="0 0 200 90"><circle cx="100" cy="45" r="30"></circle><circle cx="100" cy="45" r="8"></circle></svg>
-        @endif
-    </a>
+    <div class="img">
+        <a href="{{ route('product.show', $product) }}" aria-label="{{ $product->name }}">
+            @if ($product->primaryImage)
+                <img class="pimg" src="{{ asset('storage/'.$product->primaryImage->image_path) }}" alt="{{ $product->name }}">
+            @else
+                <svg class="glass" viewBox="0 0 200 90"><circle cx="100" cy="45" r="30"></circle><circle cx="100" cy="45" r="8"></circle></svg>
+            @endif
+        </a>
+        <button type="button" class="quickview-btn" @click="window.dispatchEvent(new CustomEvent('quick-view', {detail: {{ Illuminate\Support\Js::from([
+            'name' => $product->name,
+            'image' => $product->primaryImage ? asset('storage/'.$product->primaryImage->image_path) : null,
+            'price' => (float) $product->price,
+            'comparePrice' => $product->compare_price ? (float) $product->compare_price : null,
+            'category' => $product->category?->name ?? 'Eyewear',
+            'rating' => $rating ?? 5.0,
+            'reviewsCount' => $reviewsCount ?? 0,
+            'url' => route('product.show', $product),
+            'productId' => $product->id,
+            'inStock' => $product->stock_qty > 0,
+        ]) }}}))">
+            <svg class="icon sm" viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+            Quick View
+        </button>
+    </div>
     <div class="body">
         <span class="cat">{{ $product->category?->name ?? 'Eyewear' }}</span>
         <h3><a href="{{ route('product.show', $product) }}" style="color:inherit">{{ $product->name }}</a></h3>

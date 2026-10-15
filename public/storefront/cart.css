@@ -10,8 +10,8 @@ h1,h2,h3{font-family:var(--ds);font-weight:600;letter-spacing:-.02em;color:var(-
 .eyebrow{font-weight:600;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--blue)}
 .icon{width:20px;height:20px;stroke:currentColor;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round;flex:none}.icon.sm{width:16px;height:16px}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;font-family:var(--ui);font-weight:600;font-size:15px;border-radius:999px;border:1px solid transparent;padding:14px 26px;cursor:pointer;transition:transform .15s,box-shadow .15s,background .15s;line-height:1;width:100%}
-.btn-primary{background:var(--blue);color:#fff}.btn-primary:hover{color:#fff;transform:translateY(-1px);box-shadow:0 10px 24px -10px rgba(12,63,147,.7);background:var(--blue-bright)}
-.btn-ghost{background:transparent;color:var(--text);border-color:var(--line);width:auto}.btn-ghost:hover{color:var(--text);border-color:var(--blue)}
+.btn.btn-primary{background:var(--blue);color:#fff}.btn.btn-primary:hover{color:#fff;transform:translateY(-1px);box-shadow:0 10px 24px -10px rgba(12,63,147,.7);background:var(--blue-bright)}
+.btn.btn-ghost{background:transparent;color:var(--text);border-color:var(--line);width:auto}.btn.btn-ghost:hover{color:var(--text);border-color:var(--blue)}
 .util{background:var(--surface-tint);border-bottom:1px solid var(--line);font-size:12.5px;color:var(--muted)}
 .util .wrap{display:flex;align-items:center;justify-content:space-between;min-height:40px;gap:14px}
 .util-l{display:flex;align-items:center;gap:22px;flex-wrap:wrap}.util-l span{display:inline-flex;align-items:center;gap:7px;font-weight:500}.util-l .icon{stroke:var(--blue)}

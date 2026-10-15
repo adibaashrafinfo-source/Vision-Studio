@@ -4,7 +4,7 @@
     $initials = collect(explode(' ', trim($admin?->name ?? 'Admin')))
         ->filter()->take(2)->map(fn ($w) => mb_strtoupper(mb_substr($w, 0, 1)))->implode('');
     $logo = SiteSetting::get('logo_path');
-    $logoUrl = $logo ? asset('storage/'.$logo) : asset('admin/logo.jpg');
+    $logoUrl = $logo ? asset('storage/'.$logo) : asset('admin-assets/logo.jpg');
     $pendingOrders = \App\Models\Order::where('status', 'pending')->count();
     $pendingReviews = \App\Models\Review::where('status', 'pending')->count();
 @endphp
@@ -18,7 +18,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('admin/admin.css') }}">
+    <link rel="stylesheet" href="{{ asset('admin-assets/admin.css') }}">
     <script defer src="{{ asset('js/alpine.min.js') }}"></script>
     @stack('head')
 </head>

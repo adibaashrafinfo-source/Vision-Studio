@@ -13,29 +13,42 @@
 @endphp
 
 @section('content')
-    {{-- Hero --}}
-    <section class="hero" id="top">
-        <div class="wrap">
-            <div>
-                <div class="eyebrow">Clearer Vision &middot; Brighter Tomorrow</div>
-                <h1>{{ $heroHeadline }}</h1>
-                <p class="lead">{{ $heroSub }}</p>
-                <div class="hero-trust">
-                    <span><svg class="icon sm" viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"></path><path d="M9.5 12l1.8 1.8L15 10"></path></svg>100% Authentic Products</span>
-                    <span><svg class="icon sm" viewBox="0 0 24 24"><path d="M3 7h11v8H3z"></path><path d="M14 10h4l3 3v2h-7z"></path><circle cx="7" cy="17" r="2"></circle><circle cx="17" cy="17" r="2"></circle></svg>Free Shipping Over ৳2,000</span>
-                    <span><svg class="icon sm" viewBox="0 0 24 24"><path d="M3 10a9 9 0 0 1 15-4l3 3"></path><path d="M21 4v5h-5"></path><path d="M21 14a9 9 0 0 1-15 4l-3-3"></path><path d="M3 20v-5h5"></path></svg>Easy Returns</span>
-                </div>
-                <div class="hero-cta">
-                    <a href="{{ $heroCtaLink }}" class="btn btn-primary">{{ $heroCtaText }}<svg class="icon sm" viewBox="0 0 24 24" style="stroke:#fff"><path d="M5 12h14"></path><path d="M13 6l6 6-6 6"></path></svg></a>
-                    <a href="{{ route('products.index') }}" class="btn btn-ghost">Browse Collection</a>
-                </div>
-            </div>
-            <div class="hero-photo"><img src="{{ $heroImg }}" alt="{{ $heroHeadline }}"></div>
+    {{-- Hero — full-bleed auto-sliding image --}}
+    @php
+        $heroSlides = array_values(array_filter([$heroImg, asset('images/storefront/150b713472f5866e38f4f6b0eec2f367.png')]));
+    @endphp
+    <section class="hero" id="top" x-data="heroSlider({{ Illuminate\Support\Js::from($heroSlides) }})" x-init="start()">
+        <div class="hero-slides">
+            <template x-for="(img, i) in slides" :key="i">
+                <div class="hero-slide" :class="i===current && 'active'" :style="`background-image:url('${img}')`"></div>
+            </template>
         </div>
+        <div class="hero-scrim"></div>
+        <div class="wrap hero-content">
+            <div class="eyebrow">Clearer Vision &middot; Brighter Tomorrow</div>
+            <h1>{{ $heroHeadline }}</h1>
+            <p class="lead">{{ $heroSub }}</p>
+            <div class="hero-trust">
+                <span><svg class="icon sm" viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"></path><path d="M9.5 12l1.8 1.8L15 10"></path></svg>100% Authentic Products</span>
+                <span><svg class="icon sm" viewBox="0 0 24 24"><path d="M3 7h11v8H3z"></path><path d="M14 10h4l3 3v2h-7z"></path><circle cx="7" cy="17" r="2"></circle><circle cx="17" cy="17" r="2"></circle></svg>Free Shipping Over ৳2,000</span>
+                <span><svg class="icon sm" viewBox="0 0 24 24"><path d="M3 10a9 9 0 0 1 15-4l3 3"></path><path d="M21 4v5h-5"></path><path d="M21 14a9 9 0 0 1-15 4l-3-3"></path><path d="M3 20v-5h5"></path></svg>Easy Returns</span>
+            </div>
+            <div class="hero-cta">
+                <a href="{{ $heroCtaLink }}" class="btn btn-primary">{{ $heroCtaText }}<svg class="icon sm" viewBox="0 0 24 24" style="stroke:#fff"><path d="M5 12h14"></path><path d="M13 6l6 6-6 6"></path></svg></a>
+                <a href="{{ route('products.index') }}" class="btn btn-ghost" style="background:rgba(255,255,255,.12);color:#fff;border-color:rgba(255,255,255,.5)">Browse Collection</a>
+            </div>
+        </div>
+        @if (count($heroSlides) > 1)
+        <div class="hero-dots">
+            <template x-for="(img,i) in slides" :key="'dot'+i">
+                <button type="button" :class="i===current && 'on'" @click="go(i)" :aria-label="'Go to slide '+(i+1)"></button>
+            </template>
+        </div>
+        @endif
     </section>
 
     {{-- Shop by Category --}}
-    <section class="sec" id="categories">
+    <section class="sec" id="categories" data-animate>
         <div class="wrap">
             <div class="sec-head">
                 <div>
@@ -45,15 +58,20 @@
                 </div>
                 <a href="{{ route('products.index') }}" class="btn btn-ghost btn-sm">View All</a>
             </div>
-            <div class="cat-grid">
-                @forelse ($categories as $cat)
-                    <a href="{{ route('category.show', $cat) }}" class="cat-tile">
-                        <span class="cat-chip">
-                            @if ($cat->icon && ! str_contains($cat->icon, '<'))<span style="font-size:20px">{{ $cat->icon }}</span>
+            @php
+                $catGradients = ['linear-gradient(135deg,#1E6BFF,#0A1A42)', 'linear-gradient(135deg,#E0314A,#7A1026)', 'linear-gradient(135deg,#0EA5E9,#0A1A42)', 'linear-gradient(135deg,#F59E0B,#B45309)', 'linear-gradient(135deg,#8B5CF6,#3B1D7A)', 'linear-gradient(135deg,#10B981,#064E3B)'];
+            @endphp
+            <div class="cat-grid cat-grid-modern">
+                @forelse ($categories as $i => $cat)
+                    <a href="{{ route('category.show', $cat) }}" class="cat-tile-modern" data-animate style="--cat-grad:{{ $catGradients[$i % count($catGradients)] }}">
+                        <div class="cat-tile-glow"></div>
+                        <span class="cat-chip-modern">
+                            @if ($cat->icon && ! str_contains($cat->icon, '<'))<span style="font-size:28px">{{ $cat->icon }}</span>
                             @else<svg class="icon" viewBox="0 0 24 24"><rect x="2" y="9" width="8" height="6" rx="3"></rect><rect x="14" y="9" width="8" height="6" rx="3"></rect><path d="M10 11c1-1 3-1 4 0"></path></svg>@endif
                         </span>
-                        <h3>{{ $cat->name }}</h3><p>{{ \Illuminate\Support\Str::limit($cat->description, 46) ?: 'Explore the collection.' }}</p>
-                        <button class="cat-arrow" aria-label="Shop {{ $cat->name }}"><svg class="icon sm" viewBox="0 0 24 24"><path d="M5 12h14"></path><path d="M13 6l6 6-6 6"></path></svg></button>
+                        <h3>{{ $cat->name }}</h3>
+                        <p>{{ \Illuminate\Support\Str::limit($cat->description, 46) ?: 'Explore the collection.' }}</p>
+                        <span class="cat-link-modern">Shop now<svg class="icon sm" viewBox="0 0 24 24"><path d="M5 12h14"></path><path d="M13 6l6 6-6 6"></path></svg></span>
                     </a>
                 @empty
                     <p class="sec-sub">Categories will appear here once added in the admin panel.</p>
@@ -64,7 +82,7 @@
 
     {{-- Flash Sale --}}
     @if ($flash->isNotEmpty())
-    <section class="sec" id="offers" style="padding-top:12px">
+    <section class="sec" id="offers" style="padding-top:12px" data-animate>
         <div class="wrap">
             <div class="flash">
                 <div>
@@ -93,7 +111,7 @@
     @endif
 
     {{-- Best Sellers --}}
-    <section class="sec" id="bestsellers" style="padding-top:12px">
+    <section class="sec" id="bestsellers" style="padding-top:12px" data-animate>
         <div class="wrap">
             <div class="sec-head">
                 <div>
@@ -112,7 +130,7 @@
     </section>
 
     {{-- Promo banners --}}
-    <section class="sec" style="padding-top:12px">
+    <section class="sec" style="padding-top:12px" data-animate>
         <div class="wrap">
             <div class="promos">
                 <div class="promo a">
@@ -136,7 +154,7 @@
     </section>
 
     {{-- All Products --}}
-    <section class="sec" id="allproducts" style="padding-top:12px">
+    <section class="sec" id="allproducts" style="padding-top:12px" data-animate>
         <div class="wrap">
             <div class="sec-head">
                 <div>
@@ -160,7 +178,7 @@
     </section>
 
     {{-- Newsletter --}}
-    <section class="sec" style="padding-top:12px">
+    <section class="sec" style="padding-top:12px" data-animate>
         <div class="wrap">
             <div class="news">
                 <span class="nic"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="M4 7l8 6 8-6"></path></svg></span>
@@ -184,7 +202,7 @@
 
     {{-- Top Brands --}}
     @if ($brands->isNotEmpty())
-    <section class="sec" id="brands" style="padding-top:12px">
+    <section class="sec" id="brands" style="padding-top:12px" data-animate>
         <div class="wrap">
             <div class="sec-head" style="justify-content:center;text-align:center;margin-bottom:24px">
                 <div><div class="eyebrow">Authorised retailer</div><h2>Shop by Top Brands</h2></div>
@@ -198,3 +216,18 @@
     </section>
     @endif
 @endsection
+
+@push('scripts')
+<script>
+function heroSlider(slides) {
+    return {
+        slides, current: 0, timer: null,
+        start() {
+            if (this.slides.length < 2) return;
+            this.timer = setInterval(() => this.go((this.current + 1) % this.slides.length), 5000);
+        },
+        go(i) { this.current = i; },
+    };
+}
+</script>
+@endpush

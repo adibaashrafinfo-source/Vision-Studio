@@ -23,9 +23,9 @@
 
     <div class="pd">
         <div class="gallery">
-            <div class="main-img">
+            <div class="main-img" @mousemove="zoomMove($event)" @mouseenter="zooming=true" @mouseleave="zooming=false">
                 @if ($product->discount_percent)<span class="off">-{{ $product->discount_percent }}%</span>@endif
-                <img class="pimg" :src="images[current]" alt="{{ $product->name }}" style="width:80%;height:80%">
+                <img class="pimg zoomimg" :src="images[current]" alt="{{ $product->name }}" style="width:80%;height:80%" :style="zooming ? `transform:scale(2);transform-origin:${zoomX}% ${zoomY}%` : ''">
             </div>
             @if ($images->count() > 1)
             <div class="thumbs">
@@ -63,20 +63,31 @@
                 </div>
             @endforeach
 
-            <form method="POST" action="{{ route('cart.add') }}">
-                @csrf
-                <input type="hidden" name="product_id" value="{{ $product->id }}">
-                <input type="hidden" name="qty" :value="qty">
-                <div class="buyrow">
-                    <div class="qty"><button type="button" aria-label="Decrease" @click="qty=Math.max(1,qty-1)">−</button><span class="q tnum" x-text="qty"></span><button type="button" aria-label="Increase" @click="qty++">+</button></div>
-                    <button type="submit" class="btn btn-primary" style="flex:1;min-width:200px" {{ $inStock ? '' : 'disabled' }}>
-                        <svg class="icon sm" viewBox="0 0 24 24" style="stroke:#fff"><path d="M6 6h15l-1.5 9h-12z"></path><path d="M6 6L5 3H2"></path><circle cx="9" cy="20" r="1.5"></circle><circle cx="18" cy="20" r="1.5"></circle></svg>
-                        Add to Cart — <span x-text="money(price*qty)"></span>
+            <div class="buyrow" style="margin-bottom:0">
+                <div class="qty"><button type="button" aria-label="Decrease" @click="qty=Math.max(1,qty-1)">−</button><span class="q tnum" x-text="qty"></span><button type="button" aria-label="Increase" @click="qty++">+</button></div>
+                @php $inWishlist = \App\Support\Wishlist::has($product->id); @endphp
+                <form method="POST" action="{{ route('wishlist.toggle', $product) }}" style="margin:0;display:inline;order:3">@csrf<button type="submit" class="wish" aria-label="{{ $inWishlist ? 'Remove from' : 'Add to' }} wishlist" style="{{ $inWishlist ? 'background:var(--sale);color:#fff;border-color:var(--sale)' : '' }}"><svg class="icon" viewBox="0 0 24 24" style="{{ $inWishlist ? 'fill:#fff;stroke:#fff' : '' }}"><path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"></path></svg></button></form>
+            </div>
+            <div class="buyrow" style="margin-top:12px">
+                <form method="POST" action="{{ route('cart.add') }}" style="flex:1;min-width:180px;margin:0">
+                    @csrf
+                    <input type="hidden" name="product_id" value="{{ $product->id }}">
+                    <input type="hidden" name="qty" :value="qty">
+                    <button type="submit" class="btn btn-ghost" style="width:100%" {{ $inStock ? '' : 'disabled' }}>
+                        <svg class="icon sm" viewBox="0 0 24 24"><path d="M6 6h15l-1.5 9h-12z"></path><path d="M6 6L5 3H2"></path><circle cx="9" cy="20" r="1.5"></circle><circle cx="18" cy="20" r="1.5"></circle></svg>
+                        Add to Cart
                     </button>
-                    @php $inWishlist = \App\Support\Wishlist::has($product->id); @endphp
-                    <form method="POST" action="{{ route('wishlist.toggle', $product) }}" style="margin:0;display:inline">@csrf<button type="submit" class="wish" aria-label="{{ $inWishlist ? 'Remove from' : 'Add to' }} wishlist" style="{{ $inWishlist ? 'background:var(--sale);color:#fff;border-color:var(--sale)' : '' }}"><svg class="icon" viewBox="0 0 24 24" style="{{ $inWishlist ? 'fill:#fff;stroke:#fff' : '' }}"><path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"></path></svg></button></form>
-                </div>
-            </form>
+                </form>
+                <form method="POST" action="{{ route('checkout.buy-now') }}" style="flex:1;min-width:180px;margin:0">
+                    @csrf
+                    <input type="hidden" name="product_id" value="{{ $product->id }}">
+                    <input type="hidden" name="qty" :value="qty">
+                    <button type="submit" class="btn btn-primary" style="width:100%" {{ $inStock ? '' : 'disabled' }}>
+                        <svg class="icon sm" viewBox="0 0 24 24" style="stroke:#fff"><path d="M13 2L4 14h7l-1 8 9-12h-7z"></path></svg>
+                        Buy Now — <span x-text="money(price*qty)"></span>
+                    </button>
+                </form>
+            </div>
 
             <div class="assure">
                 <div><svg class="icon sm" viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"></path><path d="M9.5 12l1.8 1.8L15 10"></path></svg>100% Authentic + Warranty</div>
@@ -172,7 +183,13 @@
 function productPage(price, images) {
     return {
         price, images, current: 0, qty: 1,
+        zooming: false, zoomX: 50, zoomY: 50,
         money(n) { return '৳' + Number(n).toLocaleString('en-IN'); },
+        zoomMove(e) {
+            const rect = e.currentTarget.getBoundingClientRect();
+            this.zoomX = ((e.clientX - rect.left) / rect.width) * 100;
+            this.zoomY = ((e.clientY - rect.top) / rect.height) * 100;
+        },
     };
 }
 </script>

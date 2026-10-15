@@ -13,7 +13,7 @@
 @endphp
 
 @section('content')
-<div x-data="{ logo: @js(($s['logo_path'] ?? null) ? asset('storage/'.$s['logo_path']) : asset('admin/logo.jpg')) }">
+<div x-data="{ logo: @js(($s['logo_path'] ?? null) ? asset('storage/'.$s['logo_path']) : asset('admin-assets/logo.jpg')) }">
     <div class="ph-head">
         <div><h1>Appearance</h1><p>Control your brand logo and the colours used across the live storefront.</p></div>
     </div>
