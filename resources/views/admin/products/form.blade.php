@@ -73,6 +73,25 @@
                             </div>
                             <p class="sec-sub" style="margin-top:10px">The first uploaded image becomes the primary image if none is set. Recommended 800×800px.</p>
                         </div>
+
+                        <div class="field">
+                            <label>Product Video</label>
+                            @if ($product->video_path)
+                                <div class="drow" style="align-items:center;gap:12px;margin-bottom:10px">
+                                    <video src="{{ asset('storage/'.$product->video_path) }}" controls style="width:220px;border-radius:8px;background:#000"></video>
+                                    <form method="POST" action="{{ route('admin.products.video.destroy', $product) }}" onsubmit="return confirm('Remove this video?')">
+                                        @csrf @method('DELETE')
+                                        <button type="submit" class="btn btn-ghost">Remove video</button>
+                                    </form>
+                                </div>
+                            @endif
+                            <label class="g add" style="cursor:pointer;width:160px;height:90px">
+                                <svg class="icon sm" viewBox="0 0 24 24"><path d="M23 7l-7 5 7 5V7z"></path><rect x="1" y="5" width="15" height="14" rx="2"></rect></svg>
+                                {{ $product->video_path ? 'Replace video' : 'Upload video' }}
+                                <input type="file" name="video" accept="video/mp4,video/quicktime,video/webm" class="hide">
+                            </label>
+                            <p class="sec-sub" style="margin-top:10px">Optional. MP4, MOV or WebM, up to 50MB. Shown on the product detail page alongside the images.</p>
+                        </div>
                     </div>
 
                     {{-- Variants --}}

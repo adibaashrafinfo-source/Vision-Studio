@@ -69,6 +69,7 @@ class ProductsController extends Controller
 
         $product = Product::create($data);
         $this->syncImages($request, $product);
+        $this->syncVideo($request, $product);
         $this->syncVariants($request, $product);
 
         return redirect()->route('admin.products.index')->with('status', 'Product created.');
@@ -81,9 +82,20 @@ class ProductsController extends Controller
 
         $product->update($data);
         $this->syncImages($request, $product);
+        $this->syncVideo($request, $product);
         $this->syncVariants($request, $product);
 
         return redirect()->route('admin.products.index')->with('status', 'Product updated.');
+    }
+
+    public function destroyVideo(Product $product): RedirectResponse
+    {
+        if ($product->video_path) {
+            Storage::disk('public')->delete($product->video_path);
+            $product->update(['video_path' => null]);
+        }
+
+        return back()->with('status', 'Video removed.');
     }
 
     public function toggleFeatured(Product $product): RedirectResponse
@@ -132,9 +144,11 @@ class ProductsController extends Controller
             'status' => ['required', 'in:active,draft,inactive'],
             'short_desc' => ['nullable', 'string'],
             'long_desc' => ['nullable', 'string'],
+            'video' => ['nullable', 'file', 'mimetypes:video/mp4,video/quicktime,video/webm', 'max:51200'],
         ]);
 
         $validated['featured'] = $request->boolean('featured');
+        unset($validated['video']);
 
         return $validated;
     }
@@ -153,6 +167,20 @@ class ProductsController extends Controller
                 'stock_qty' => $v['stock_qty'] ?? 0,
             ]);
         }
+    }
+
+    private function syncVideo(Request $request, Product $product): void
+    {
+        if (! $request->hasFile('video')) {
+            return;
+        }
+
+        if ($product->video_path) {
+            Storage::disk('public')->delete($product->video_path);
+        }
+
+        $path = $request->file('video')->store('products/videos', 'public');
+        $product->update(['video_path' => $path]);
     }
 
     private function syncImages(Request $request, Product $product): void

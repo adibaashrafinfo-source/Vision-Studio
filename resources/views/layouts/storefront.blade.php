@@ -195,7 +195,7 @@
 
     {{-- Quick View modal --}}
     <div x-data="{ show:false, p:null }" x-init="window.addEventListener('quick-view', e => { p = e.detail; show = true })" x-show="show" x-cloak
-         style="position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;padding:20px">
+         class="qv-overlay">
         <div x-show="show" x-transition.opacity @click="show=false" style="position:absolute;inset:0;background:rgba(10,18,40,.6)"></div>
         <div x-show="show" x-transition.scale.95 class="qv-modal" @click.outside="show=false" style="position:relative" x-cloak>
             <button type="button" class="qv-close" @click="show=false" aria-label="Close">&times;</button>

@@ -19,6 +19,7 @@ class Product extends Model
         'featured',
         'short_desc',
         'long_desc',
+        'video_path',
     ];
 
     protected function casts(): array

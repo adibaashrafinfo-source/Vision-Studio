@@ -66,6 +66,11 @@
         .alert ul{margin:0;padding-left:18px}
         .alert li{color:var(--sale);font-size:13px}
         .foot-note{margin-top:24px;font-size:12px;color:var(--muted);text-align:center}
+        .back-home{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);
+            text-decoration:none;margin-bottom:22px;transition:color .15s}
+        .back-home:hover{color:var(--blue)}
+        .back-home svg{width:15px;height:15px;stroke:currentColor;stroke-width:1.8;fill:none;
+            stroke-linecap:round;stroke-linejoin:round}
         @media (max-width:760px){
             .wrap{grid-template-columns:1fr;max-width:420px}
             .brand{display:none}
@@ -106,6 +111,10 @@
         </div>
 
         <div class="form">
+            <a href="{{ route('home') }}" class="back-home">
+                <svg viewBox="0 0 24 24"><path d="M19 12H5"></path><path d="M11 18l-6-6 6-6"></path></svg>
+                Back to Home page
+            </a>
             <h2>Sign in</h2>
             <p class="sub">Welcome back. Enter your credentials to continue.</p>
 

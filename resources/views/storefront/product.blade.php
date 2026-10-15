@@ -23,15 +23,27 @@
 
     <div class="pd">
         <div class="gallery">
-            <div class="main-img" @mousemove="zoomMove($event)" @mouseenter="zooming=true" @mouseleave="zooming=false">
+            <div class="main-img" @mousemove="!showVideo && zoomMove($event)" @mouseenter="!showVideo && (zooming=true)" @mouseleave="zooming=false">
                 @if ($product->discount_percent)<span class="off">-{{ $product->discount_percent }}%</span>@endif
-                <img class="pimg zoomimg" :src="images[current]" alt="{{ $product->name }}" style="width:80%;height:80%" :style="zooming ? `transform:scale(2);transform-origin:${zoomX}% ${zoomY}%` : ''">
+                <template x-if="!showVideo">
+                    <img class="pimg zoomimg" :src="images[current]" alt="{{ $product->name }}" style="width:80%;height:80%" :style="zooming ? `transform:scale(2);transform-origin:${zoomX}% ${zoomY}%` : ''">
+                </template>
+                @if ($product->video_path)
+                <template x-if="showVideo">
+                    <video class="pimg" src="{{ asset('storage/'.$product->video_path) }}" style="width:100%;height:100%" controls autoplay></video>
+                </template>
+                @endif
             </div>
-            @if ($images->count() > 1)
+            @if ($images->count() > 1 || $product->video_path)
             <div class="thumbs">
                 @foreach ($images as $i => $img)
-                    <button class="thumb" :class="current==={{ $i }} && 'on'" @click="current={{ $i }}" aria-label="View {{ $i+1 }}"><img class="pimg" src="{{ $img }}" alt=""></button>
+                    <button class="thumb" :class="(!showVideo && current==={{ $i }}) && 'on'" @click="showVideo=false;current={{ $i }}" aria-label="View {{ $i+1 }}"><img class="pimg" src="{{ $img }}" alt=""></button>
                 @endforeach
+                @if ($product->video_path)
+                    <button class="thumb" :class="showVideo && 'on'" @click="showVideo=true" aria-label="Play product video" style="display:flex;align-items:center;justify-content:center;background:var(--navy)">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3l16 9-16 9V3z"></path></svg>
+                    </button>
+                @endif
             </div>
             @endif
         </div>
@@ -183,7 +195,7 @@
 function productPage(price, images) {
     return {
         price, images, current: 0, qty: 1,
-        zooming: false, zoomX: 50, zoomY: 50,
+        zooming: false, zoomX: 50, zoomY: 50, showVideo: false,
         money(n) { return '৳' + Number(n).toLocaleString('en-IN'); },
         zoomMove(e) {
             const rect = e.currentTarget.getBoundingClientRect();

@@ -135,6 +135,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // Products — full CRUD.
         Route::put('products/{product}/feature', [ProductsController::class, 'toggleFeatured'])->name('products.feature');
         Route::delete('products/{product}/images/{image}', [ProductsController::class, 'destroyImage'])->name('products.images.destroy');
+        Route::delete('products/{product}/video', [ProductsController::class, 'destroyVideo'])->name('products.video.destroy');
         Route::resource('products', ProductsController::class)->except('show');
 
         // Categories — full CRUD.
