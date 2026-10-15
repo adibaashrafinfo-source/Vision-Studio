@@ -26,7 +26,7 @@
             <div class="main-img" @mousemove="!showVideo && zoomMove($event)" @mouseenter="!showVideo && (zooming=true)" @mouseleave="zooming=false">
                 @if ($product->discount_percent)<span class="off">-{{ $product->discount_percent }}%</span>@endif
                 <template x-if="!showVideo">
-                    <img class="pimg zoomimg" :src="images[current]" alt="{{ $product->name }}" style="width:80%;height:80%" :style="zooming ? `transform:scale(2);transform-origin:${zoomX}% ${zoomY}%` : ''">
+                    <img class="pimg zoomimg" :src="images[current]" alt="{{ $product->name }}" :style="zooming ? `transform:scale(2);transform-origin:${zoomX}% ${zoomY}%` : ''">
                 </template>
                 @if ($product->video_path)
                 <template x-if="showVideo">

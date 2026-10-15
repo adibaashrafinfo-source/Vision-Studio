@@ -12,9 +12,9 @@ h1,h2,h3,h4{font-family:var(--ds);font-weight:600;letter-spacing:-.02em;color:va
 .icon{width:18px;height:18px;stroke:currentColor;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round;flex:none}
 .icon.sm{width:15px;height:15px}.icon.xs{width:13px;height:13px}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-family:var(--ui);font-weight:600;font-size:13px;border-radius:11px;border:1px solid transparent;padding:10px 16px;cursor:pointer;transition:all .15s;line-height:1;white-space:nowrap}
-.btn-primary{background:var(--blue);color:#fff}.btn-primary:hover{background:var(--blue-bright)}
-.btn-ghost{background:var(--surface);color:var(--text);border-color:var(--line)}.btn-ghost:hover{border-color:var(--blue);color:var(--blue)}
-.btn-dark{background:var(--navy);color:#fff}.btn-dark:hover{opacity:.9}
+.btn.btn-primary{background:var(--blue);color:#fff}.btn.btn-primary:hover{background:var(--blue-bright);color:#fff}
+.btn.btn-ghost{background:var(--surface);color:var(--text);border-color:var(--line)}.btn.btn-ghost:hover{border-color:var(--blue);color:var(--blue)}
+.btn.btn-dark{background:var(--navy);color:#fff}.btn.btn-dark:hover{opacity:.9;color:#fff}
 .btn-sm{padding:8px 13px;font-size:12.5px}
 .pimg{width:88%;height:88%;object-fit:contain;mix-blend-mode:multiply;display:block}
 
@@ -23,6 +23,7 @@ h1,h2,h3,h4{font-family:var(--ds);font-weight:600;letter-spacing:-.02em;color:va
 .adm-side{width:236px;flex:none;background:linear-gradient(180deg,#0A1A42,#0B1E4C 55%,#09173E);color:#EAF0FF;display:flex;flex-direction:column;position:sticky;top:0;align-self:flex-start;height:100vh}
 .adm-logo{display:flex;align-items:center;gap:11px;padding:19px 18px 15px}
 .adm-logo .lmk{width:40px;height:40px;border-radius:11px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;flex:none;overflow:hidden}
+.adm-logo .lmk svg{width:72%;height:auto}
 .adm-logo .lmk img{width:80%;height:80%;object-fit:contain;filter:brightness(0) invert(1)}
 .adm-logo .lt{display:flex;flex-direction:column;line-height:1.15}
 .adm-logo .lt b{font-family:var(--ds);font-weight:700;font-size:16px;color:#fff}

@@ -27,7 +27,9 @@
     <div class="adm">
         <aside class="adm-side">
             <div class="adm-logo">
-                <span class="lmk"><img src="{{ $logoUrl }}" alt="{{ config('app.name') }}"></span>
+                <span class="lmk">
+                    <svg viewBox="0 0 48 24" fill="none" aria-hidden="true"><circle cx="13" cy="12" r="8.5" stroke="#fff" stroke-width="2"></circle><circle cx="35" cy="12" r="8.5" stroke="#fff" stroke-width="2"></circle><path d="M21.5 12h5" stroke="#fff" stroke-width="2"></path><path d="M4.5 12h-3M46.5 12h-3" stroke="#fff" stroke-width="2" stroke-linecap="round"></path></svg>
+                </span>
                 <div class="lt"><b>{{ config('app.name') }}</b><span>E-Commerce Admin</span></div>
             </div>
             <nav class="adm-nav">

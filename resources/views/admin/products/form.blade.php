@@ -66,12 +66,17 @@
                                         </form>
                                     </div>
                                 @endforeach
-                                <template x-for="(src,i) in previews" :key="i"><div class="g"><img class="pimg" :src="src"></div></template>
-                                <label class="g add" style="cursor:pointer"><svg class="icon sm" viewBox="0 0 24 24"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>Upload
-                                    <input type="file" name="images[]" accept="image/*" multiple class="hide" @change="preview($event)">
+                                <template x-for="(p,i) in previews" :key="p.id">
+                                    <div class="g">
+                                        <img class="pimg" :src="p.url">
+                                        <button type="button" title="Remove image" @click="removeImage(i)" style="position:absolute;top:5px;right:5px;z-index:1;width:20px;height:20px;border-radius:50%;background:var(--surface);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--muted);cursor:pointer;line-height:1">✕</button>
+                                    </div>
+                                </template>
+                                <label class="g add" style="cursor:pointer"><svg class="icon sm" viewBox="0 0 24 24"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>Upload Images
+                                    <input type="file" name="images[]" accept="image/*" multiple class="hide" x-ref="imageInput" @change="addImages($event)">
                                 </label>
                             </div>
-                            <p class="sec-sub" style="margin-top:10px">The first uploaded image becomes the primary image if none is set. Recommended 800×800px.</p>
+                            <p class="sec-sub" style="margin-top:10px">You can add several images — pick more than one at a time, or click "Upload Images" again to add more. The first image becomes the primary image if none is set. Recommended 800×800px.</p>
                         </div>
 
                         <div class="field">
@@ -139,10 +144,27 @@ function productForm() {
     return {
         tab: 'basic',
         previews: [],
+        _files: [],
+        _seq: 0,
         featured: {{ old('featured', $product->featured) ? 'true' : 'false' }},
         variants: {{ Illuminate\Support\Js::from($variantData) }},
-        preview(e) {
-            this.previews = Array.from(e.target.files).map(f => URL.createObjectURL(f));
+        addImages(e) {
+            for (const f of Array.from(e.target.files)) {
+                this._files.push(f);
+                this.previews.push({ id: ++this._seq, url: URL.createObjectURL(f) });
+            }
+            this.syncInput();
+        },
+        removeImage(i) {
+            URL.revokeObjectURL(this.previews[i].url);
+            this._files.splice(i, 1);
+            this.previews.splice(i, 1);
+            this.syncInput();
+        },
+        syncInput() {
+            const dt = new DataTransfer();
+            this._files.forEach(f => dt.items.add(f));
+            this.$refs.imageInput.files = dt.files;
         },
     };
 }

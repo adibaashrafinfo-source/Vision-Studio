@@ -50,7 +50,7 @@ h1,h2,h3{font-family:var(--ds);font-weight:600;letter-spacing:-.02em;color:var(-
 .pd{display:grid;grid-template-columns:1.05fr 1fr;gap:46px;padding-bottom:20px}
 .gallery{display:flex;flex-direction:column;gap:16px}
 .main-img{aspect-ratio:4/3;background:var(--surface-tint);border:1px solid var(--line);border-radius:20px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;cursor:zoom-in}
-.zoomimg{transition:transform .08s ease-out;will-change:transform}
+.zoomimg{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:6%;transition:transform .12s ease-out;will-change:transform}
 .main-img .glass{width:56%}.main-img .glass *{stroke:var(--blue);stroke-width:5;fill:none;vector-effect:non-scaling-stroke}
 .main-img .off{position:absolute;top:16px;left:16px;background:var(--sale);color:#fff;font-size:12px;font-weight:700;padding:5px 12px;border-radius:999px}
 .thumbs{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
